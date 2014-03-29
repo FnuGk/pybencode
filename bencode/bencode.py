@@ -18,7 +18,7 @@ Integers: i<integer encoded in base ten ASCII>e
 Integers are encoded as "i<integer encoded in base ten ASCII>e" the initial i
 and trailing e is the beginning and ending delimiters. A negative integer can be
 represented as i-42e while positive are represented as i42e. Padding the integer
-with zeroes are not allowed, as such i042e is invalid. However the value i0e is
+with zeros are not allowed, as such i042e is invalid. However the value i0e is
 allowed.
 Example:
     "i42e" encodes the integer 42
@@ -58,7 +58,7 @@ if sys.version_info.major == 2:
     chr = unichr
     string_type = basestring
 elif sys.version_info.major == 3:
-    # chr should assume unicode
+    # chr should assume Unicode
     string_type = str
 
 
@@ -81,7 +81,7 @@ def decode(b_data):
         while len(data) != 0:
             char = data.pop()
 
-            # bencoded dict
+            # bencoded dictionary
             if char == 'd':
                 char = data.pop()
                 b_dict = {}

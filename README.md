@@ -4,7 +4,8 @@ pybencode
 Simple bencode implementation in python.
 ________________________________________
 
-This is only meant as a simple and readable implementation of bencoding. No optimisation is made.
+This is only meant as a simple and readable implementation of bencoding. No
+optimization is made.
 
 Usage
 -----
@@ -15,7 +16,7 @@ assuming
 from benched import encode, decode
 ```
 
-you can de the following:
+you can do the following:
 
 Encoding
 
