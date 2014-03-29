@@ -5,7 +5,7 @@ Simple bencode implementation in python.
 ________________________________________
 
 This is only meant as a simple and readable implementation of bencoding. No
-optimization is made.
+optimization is made so it really should not be used in production.
 
 Usage
 -----
@@ -13,7 +13,7 @@ Usage
 assuming
 
 ```python
-from benched import encode, decode
+from bencode import encode, decode
 ```
 
 you can do the following:
