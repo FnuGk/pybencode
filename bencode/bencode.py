@@ -48,7 +48,6 @@ from __future__ import (
     print_function,
     unicode_literals
 )
-from collections import OrderedDict
 
 import sys
 from pprint import pprint
@@ -157,12 +156,10 @@ def encode(data):
 
     # data is a dictionary
     elif isinstance(data, dict):
-        # We must first sort the dictionary by its keys
-        sorted_data = OrderedDict(sorted(data.items(), key=lambda t: t[0]))
-        key_value_pairs_list = [encode(key) + encode(value)
-                                for key, value in sorted_data.iteritems()]
-        key_value_pairs = "".join(key_value_pairs_list)  # Flatten the list
-        b_dict = "d{key_value_pairs}e".format(key_value_pairs=key_value_pairs)
+        b_dict = "d"
+        for key in sorted(data.keys()):
+            b_dict += encode(key) + encode(data[key])
+        b_dict += "e"
         return b_dict
 
     else:
