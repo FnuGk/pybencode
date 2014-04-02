@@ -65,7 +65,7 @@ def decode(b_data):
     """
     Decodes a bencoded byte array into the relevant python data type
 
-    :param b_data: Byte array of bencoded data
+    :param b_data: A byte string of bencoded data
     :rtype : Either a {Dict|List|Integer|String}
     """
 
@@ -81,10 +81,10 @@ def decode(b_data):
             char = data.pop()
 
             # bencoded dictionary
-            if char == 'd':
+            if char == b'd':
                 char = data.pop()
                 b_dict = {}
-                while char != 'e':
+                while char != b'e':
                     data.append(char)
                     key = _bdecode(data)
                     b_dict[key] = _bdecode(data)
@@ -92,31 +92,31 @@ def decode(b_data):
                 return b_dict
 
             # bencoded list
-            elif char == 'l':
+            elif char == b'l':
                 char = data.pop()
                 b_list = []
-                while char != 'e':
+                while char != b'e':
                     data.append(char)
                     b_list.append(_bdecode(data))
                     char = data.pop()
                 return b_list
 
             # bencoded integer
-            elif char == 'i':
+            elif char == b'i':
                 char = data.pop()
                 b_int = ''
-                while char != 'e':
+                while char != b'e':
                     b_int += char
                     char = data.pop()
                 return int(b_int)
 
             # bencoded string
             elif char.isdigit():
-                line_len = ''
+                line_len = b''
                 while char.isdigit():
                     line_len += char
                     char = data.pop()
-                b_string = ''
+                b_string = b''
                 for _ in range(int(line_len)):
                     b_string += data.pop()
                 return b_string
@@ -125,7 +125,6 @@ def decode(b_data):
 
     data_list = list(b_data)
     data_list.reverse()  # We want to be able to pop from the start
-    data_list = [chr(c) for c in data_list]  # map chr to data_list
     return _bdecode(data_list)
 
 
@@ -140,26 +139,26 @@ def encode(data):
 
     # data is a string
     if isinstance(data, string_type):
-        b_string = "{length}:{str}".format(length=len(data), str=data)
+        b_string = b"{length}:{str}".format(length=len(data), str=data)
         return b_string
 
     # data is an integer
     elif isinstance(data, int):
-        b_int = "i{integer}e".format(integer=str(data))
+        b_int = b"i{integer}e".format(integer=str(data))
         return b_int
 
     # data is a list
     elif isinstance(data, list):
         list_elements = "".join([encode(element) for element in data])
-        b_list = "l{list_elements}e".format(list_elements=list_elements)
+        b_list = b"l{list_elements}e".format(list_elements=list_elements)
         return b_list
 
     # data is a dictionary
     elif isinstance(data, dict):
-        b_dict = "d"
+        b_dict = b"d"
         for key in sorted(data.keys()):
             b_dict += encode(key) + encode(data[key])
-        b_dict += "e"
+        b_dict += b"e"
         return b_dict
 
     else:
@@ -170,22 +169,35 @@ def main(argv):
     if len(argv) > 1:
         path = argv[1]
         with open(path, "rb") as f:
-            content = bytearray(f.read())
-            b_data = decode(content)
-            b_data['info']['pieces'] = ''.join(["{0:02x}".format(ord(x)) for
-                                                x in b_data['info']['pieces']])
-            pprint(b_data)
+            content = bytes(f.read())
+            decoded_content = decode(content)
+            re_encoded_content = bytes(encode(decoded_content))
 
-    assert encode("Hello") == "5:Hello"
-    assert encode(23) == "i23e"
-    assert encode([1, 2, 3]) == "li1ei2ei3ee"
+            assert content == re_encoded_content
+
+            # The pieces is in binary so lets convert it to hex before printing
+            decoded_content['info']['pieces'] = \
+                ''.join(["{0:02x}".format(ord(x)) for
+                         x in decoded_content['info']['pieces']])
+            pprint(decoded_content)
+
+    assert encode("Hello") == b"5:Hello"
+    assert encode(23) == b"i23e"
+    assert encode([1, 2, 3]) == b"li1ei2ei3ee"
     assert encode(dict(str="Hello", list=[1, 2, 3])) == \
-        'd4:listli1ei2ei3ee3:str5:Helloe'
+        b'd4:listli1ei2ei3ee3:str5:Helloe'
 
-    assert decode(bytearray("5:Hello", "utf-8")) == "Hello"
-    assert decode(bytearray("i23e", "utf-8")) == 23
-    assert decode(bytearray("li1ei2ei3ee", "utf-8")) == [1, 2, 3]
-    assert decode(bytearray("d4:listli1ei2ei3ee3:str5:Helloe", "utf-8")) == \
+    assert decode(bytes("5:Hello")) == "Hello"
+    assert decode(bytes("i23e")) == 23
+    assert decode(bytes("li1ei2ei3ee")) == [1, 2, 3]
+    assert decode(bytes("d4:listli1ei2ei3ee3:str5:Helloe")) == \
+        dict(str="Hello", list=[1, 2, 3])
+
+    # same as above but using binary string literals
+    assert decode(b"5:Hello") == "Hello"
+    assert decode(b"i23e") == 23
+    assert decode(b"li1ei2ei3ee") == [1, 2, 3]
+    assert decode(b"d4:listli1ei2ei3ee3:str5:Helloe") == \
         dict(str="Hello", list=[1, 2, 3])
 
     test_data = {
@@ -199,8 +211,8 @@ def main(argv):
         }
     }
 
-    b_data = encode(test_data)
-    data = decode(bytearray(b_data, 'utf-8'))
+    decoded_content = encode(test_data)
+    data = decode(bytes(decoded_content))
     assert data == test_data
 
 
