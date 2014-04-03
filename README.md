@@ -2,10 +2,12 @@ pybencode
 =========
 
 Simple bencode implementation in python.
-________________________________________
 
 This is only meant as a simple and readable implementation of bencoding. No
 optimization is made so it really should not be used in production.
+
+The module is tested in python 2.7. Plans for python3 is on the way but
+currently it will not work in python3.
 
 Usage
 -----
@@ -31,9 +33,9 @@ assert encode(dict(str="Hello", list=[1, 2, 3])) == \
 Decoding:
 
 ```python
-assert decode(bytearray("5:Hello", "utf-8")) == "Hello"
-assert decode(bytearray("i23e", "utf-8")) == 23
-assert decode(bytearray("li1ei2ei3ee", "utf-8")) == [1, 2, 3]
-assert decode(bytearray("d4:listli1ei2ei3ee3:str5:Helloe", "utf-8")) == \
-	dict(str="Hello", list=[1, 2, 3])
+assert decode(bytes("5:Hello")) == "Hello"
+assert decode(bytes("i23e")) == 23
+assert decode(bytes("li1ei2ei3ee")) == [1, 2, 3]
+assert decode(bytes("d4:listli1ei2ei3ee3:str5:Helloe")) == \
+    dict(str="Hello", list=[1, 2, 3])
 ```
